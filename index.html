@@ -19,14 +19,27 @@
             -webkit-user-select: none;
             user-select: none;
         }
-        /* 터치 드래그 시 고정 및 스타일 효과 */
+        /* 드래그 및 터치 상태 비주얼 스타일 */
         .substrate-card {
-            touch-action: none; /* 모바일 브라우저 기본 스크롤 방지 */
+            touch-action: manipulation; /* 기본 더블탭 줌 방지 및 터치 최적화 */
+            transition: all 0.2s ease;
         }
         .draggable-active {
-            transform: scale(1.05);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+            transform: scale(1.08);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.2);
             z-index: 100;
+        }
+        /* 터치 선택 방식 시각 효과 */
+        .selected-active {
+            border-color: #4f46e5 !important;
+            background-color: #f5f3ff !important;
+            box-shadow: 0 0 0 4px rgba(129, 140, 248, 0.5);
+            animation: bounceGentle 1.2s infinite alternate;
+            transform: scale(1.05);
+        }
+        @keyframes bounceGentle {
+            from { transform: translateY(0) scale(1.05); }
+            to { transform: translateY(-4px) scale(1.05); }
         }
         .correct-glow {
             animation: successGlow 1s ease-in-out infinite alternate;
@@ -50,7 +63,7 @@
 <body class="min-h-screen flex flex-col justify-between">
 
     <!-- 네비게이션 헤더 -->
-    <header class="bg-indigo-900 text-white shadow-lg py-4 px-6 sticky top-0 z-50">
+    <header class="bg-indigo-900 text-white shadow-lg py-5 px-6 sticky top-0 z-50">
         <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
             <div class="flex items-center gap-3">
                 <div class="bg-gradient-to-tr from-amber-400 to-amber-300 p-2.5 rounded-xl text-indigo-900 shadow-md">
@@ -58,41 +71,42 @@
                 </div>
                 <div>
                     <h1 class="text-xl sm:text-2xl font-bold tracking-tight">III. 생명 시스템 - 물질대사와 효소 가상 실험실</h1>
-                    <p class="text-xs text-indigo-200">고등학교 통합과학 I | 모바일 & 태블릿 터치 드래그 완벽 지원</p>
+                    <p class="text-xs text-indigo-200">고등학교 통합과학 I | 모바일 & 태블릿 터치 최적화 완료</p>
                 </div>
             </div>
             <div class="bg-indigo-950/80 px-4 py-2 rounded-xl border border-indigo-800 text-xs font-semibold text-amber-400">
-                <i class="fa-solid fa-circle-check mr-1"></i> 학생 모바일/패드 자율 접속 화면
+                <i class="fa-solid fa-circle-check mr-1"></i> 터치 선택(Tap) / 드래그(Drag) 지원
             </div>
         </div>
     </header>
 
     <!-- 메인 콘텐츠 영역 -->
-    <main class="flex-grow max-w-7xl w-full mx-auto p-3 sm:p-6 lg:p-8">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
+    <main class="flex-grow max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
             
             <!-- 설명 및 상태판 (좌측 4열) -->
-            <div class="lg:col-span-4 flex flex-col gap-4 sm:gap-6">
-                <div class="bg-white p-5 sm:p-6 rounded-2xl shadow-sm border border-slate-100">
+            <div class="lg:col-span-4 flex flex-col gap-6">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
                     <span class="bg-amber-100 text-amber-800 text-xs font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">가상 실험 01</span>
-                    <h2 class="text-xl sm:text-2xl font-bold mt-2 text-slate-800">기질 특이성 확인하기</h2>
+                    <h2 class="text-2xl font-bold mt-2 text-slate-800">기질 특이성 확인하기</h2>
                     <p class="text-slate-600 mt-2 text-sm leading-relaxed">
-                        손가락이나 마우스로 영양소(기질)를 끌어당겨 알맞은 모양의 홈을 가진 효소에 결합시켜 보세요!
+                        효소는 고유한 입체 구조를 가져 알맞은 기질하고만 결합하는 <strong>기질 특이성</strong>이 있습니다. 영양소와 효소를 매칭해 보세요!
                     </p>
                     
-                    <div class="mt-4 p-4 bg-indigo-50 rounded-xl border border-indigo-100">
-                        <h4 class="font-bold text-indigo-900 text-sm"><i class="fa-solid fa-circle-info mr-1.5"></i>스마트 단말기 이용 방법</h4>
-                        <ul class="text-xs text-indigo-950 mt-1.5 space-y-1 list-disc pl-4">
-                            <li><strong>드래그 중 자동 스크롤:</strong> 카드를 잡고 화면 위/아래 경계선으로 가져가면 화면이 자동으로 스크롤됩니다.</li>
-                            <li><strong>PC 노트북:</strong> 마우스 드래그 앤 드롭으로 동일하게 동작합니다.</li>
+                    <div class="mt-5 p-4 bg-indigo-50 rounded-xl border border-indigo-100">
+                        <h4 class="font-bold text-indigo-900 text-sm mb-1.5"><i class="fa-solid fa-tablet-screen-button mr-1.5"></i>스마트폰 조작 가이드</h4>
+                        <ul class="text-xs text-indigo-950 space-y-2 list-decimal pl-4">
+                            <li><strong>기질 카드 터치:</strong> 원하는 영양소 카드를 가볍게 터치해 선택합니다. (카드 보라색 강조 효과 발생)</li>
+                            <li><strong>효소 터치:</strong> 화면을 편하게 내려 맞출 효소 구멍을 클릭하면 쏙 조립됩니다!</li>
+                            <li class="text-slate-500 font-light">PC/패드는 기존 드래그 방식도 그대로 사용하실 수 있습니다.</li>
                         </ul>
                     </div>
                 </div>
 
                 <!-- 실시간 실험 현황 대시보드 -->
-                <div class="bg-slate-900 text-white p-5 sm:p-6 rounded-2xl shadow-md">
-                    <h3 class="text-base sm:text-lg font-bold text-slate-200 border-b border-slate-800 pb-3"><i class="fa-solid fa-chart-bar mr-2 text-amber-400"></i>실험 데이터 보드</h3>
-                    <div class="mt-3 space-y-2.5 text-sm">
+                <div class="bg-slate-900 text-white p-6 rounded-2xl shadow-md">
+                    <h3 class="text-lg font-bold text-slate-200 border-b border-slate-800 pb-3"><i class="fa-solid fa-chart-bar mr-2 text-amber-400"></i>실험 데이터 보드</h3>
+                    <div class="mt-4 space-y-3 text-sm">
                         <div class="flex justify-between">
                             <span class="text-slate-400">결합 성공률:</span>
                             <span id="stat-accuracy" class="font-bold text-amber-400">0%</span>
@@ -102,121 +116,121 @@
                             <span id="stat-products" class="font-bold text-emerald-400">0개</span>
                         </div>
                         <div class="flex justify-between">
-                            <span class="text-slate-400">효소의 재사용성:</span>
-                            <span class="font-bold text-sky-400">재사용 가능 (변형 없음)</span>
+                            <span class="text-slate-400">효소의 상태:</span>
+                            <span class="font-bold text-sky-400">변형 없이 무한 재사용</span>
                         </div>
                     </div>
-                    <button onclick="resetLab()" class="w-full mt-4 bg-slate-800 hover:bg-slate-700 text-white font-medium py-2 px-4 rounded-xl text-xs transition border border-slate-700">
+                    <button onclick="resetLab()" class="w-full mt-5 bg-slate-800 hover:bg-slate-700 text-white font-medium py-2.5 px-4 rounded-xl text-xs transition border border-slate-700">
                         <i class="fa-solid fa-rotate-right mr-1.5"></i>실험 초기화
                     </button>
                 </div>
             </div>
 
             <!-- 가상 실험 공간 (우측 8열) -->
-            <div class="lg:col-span-8 bg-white p-5 sm:p-8 rounded-3xl shadow-sm border border-slate-100 flex flex-col justify-between min-h-[500px] relative overflow-hidden">
+            <div class="lg:col-span-8 bg-white p-6 sm:p-8 rounded-3xl shadow-sm border border-slate-100 flex flex-col justify-between min-h-[550px] relative overflow-hidden">
                 
                 <!-- 영양소 기질 카드 배치 영역 -->
                 <div>
-                    <h3 class="text-sm font-bold text-slate-500 mb-3 uppercase tracking-wider"><i class="fa-solid fa-box-open mr-1.5"></i>반응물 (기질)</h3>
-                    <div class="grid grid-cols-2 sm:grid-cols-4 xl:grid-cols-7 gap-2 sm:gap-3" id="substrates-container">
+                    <h3 class="text-sm font-bold text-slate-500 mb-4 uppercase tracking-wider"><i class="fa-solid fa-box-open mr-1.5"></i>반응물 (기질) - 터치하여 선택하거나 드래그</h3>
+                    <div class="grid grid-cols-2 sm:grid-cols-4 xl:grid-cols-7 gap-3" id="substrates-container">
                         <!-- 1. 녹말 -->
-                        <div id="sub-starch" draggable="true" class="substrate-card bg-sky-50 border border-sky-200 p-2.5 sm:p-3 rounded-2xl flex flex-col items-center transition duration-150 animate-pulse" data-match="enzyme-amylase">
+                        <div id="sub-starch" draggable="true" class="substrate-card bg-sky-50 border border-sky-200 p-3 rounded-2xl flex flex-col items-center cursor-pointer" data-match="enzyme-amylase">
                             <span class="text-2xl select-none">🍞</span>
-                            <span class="font-bold text-[11px] text-sky-950 mt-1 select-none">녹말</span>
-                            <svg class="w-6 h-6 mt-1 text-sky-500 pointer-events-none" viewBox="0 0 100 100"><circle cx="50" cy="50" r="25" fill="currentColor"/></svg>
+                            <span class="font-bold text-xs text-sky-950 mt-1 select-none">녹말</span>
+                            <svg class="w-8 h-8 mt-1.5 text-sky-500 pointer-events-none" viewBox="0 0 100 100"><circle cx="50" cy="50" r="22" fill="currentColor"/></svg>
                         </div>
                         <!-- 2. 글리코젠 -->
-                        <div id="sub-glycogen" draggable="true" class="substrate-card bg-sky-50 border border-sky-200 p-2.5 sm:p-3 rounded-2xl flex flex-col items-center transition duration-150" data-match="enzyme-amylase">
+                        <div id="sub-glycogen" draggable="true" class="substrate-card bg-sky-50 border border-sky-200 p-3 rounded-2xl flex flex-col items-center cursor-pointer" data-match="enzyme-amylase">
                             <span class="text-2xl select-none">🍚</span>
-                            <span class="font-bold text-[11px] text-sky-950 mt-1 select-none">글리코젠</span>
-                            <svg class="w-6 h-6 mt-1 text-sky-400 pointer-events-none" viewBox="0 0 100 100"><circle cx="50" cy="50" r="20" fill="currentColor"/></svg>
+                            <span class="font-bold text-xs text-sky-950 mt-1 select-none">글리코젠</span>
+                            <svg class="w-8 h-8 mt-1.5 text-sky-400 pointer-events-none" viewBox="0 0 100 100"><circle cx="35" cy="50" r="14" fill="currentColor"/><circle cx="65" cy="50" r="14" fill="currentColor"/></svg>
                         </div>
                         <!-- 3. 단백질 -->
-                        <div id="sub-protein" draggable="true" class="substrate-card bg-rose-50 border border-rose-200 p-2.5 sm:p-3 rounded-2xl flex flex-col items-center transition duration-150 animate-pulse" data-match="enzyme-pepsin">
+                        <div id="sub-protein" draggable="true" class="substrate-card bg-rose-50 border border-rose-200 p-3 rounded-2xl flex flex-col items-center cursor-pointer" data-match="enzyme-pepsin">
                             <span class="text-2xl select-none">🥩</span>
-                            <span class="font-bold text-[11px] text-rose-950 mt-1 select-none">단백질</span>
-                            <svg class="w-6 h-6 mt-1 text-rose-500 pointer-events-none" viewBox="0 0 100 100"><polygon points="50,15 90,85 10,85" fill="currentColor"/></svg>
+                            <span class="font-bold text-xs text-rose-950 mt-1 select-none">단백질</span>
+                            <svg class="w-8 h-8 mt-1.5 text-rose-500 pointer-events-none" viewBox="0 0 100 100"><polygon points="50,18 88,82 12,82" fill="currentColor"/></svg>
                         </div>
                         <!-- 4. 콜라겐 -->
-                        <div id="sub-collagen" draggable="true" class="substrate-card bg-rose-50 border border-rose-200 p-2.5 sm:p-3 rounded-2xl flex flex-col items-center transition duration-150" data-match="enzyme-pepsin">
+                        <div id="sub-collagen" draggable="true" class="substrate-card bg-rose-50 border border-rose-200 p-3 rounded-2xl flex flex-col items-center cursor-pointer" data-match="enzyme-pepsin">
                             <span class="text-2xl select-none">🦴</span>
-                            <span class="font-bold text-[11px] text-rose-950 mt-1 select-none">콜라겐</span>
-                            <svg class="w-6 h-6 mt-1 text-rose-400 pointer-events-none" viewBox="0 0 100 100"><polygon points="50,15 90,85 10,85" fill="currentColor"/></svg>
+                            <span class="font-bold text-xs text-rose-950 mt-1 select-none">콜라겐</span>
+                            <svg class="w-8 h-8 mt-1.5 text-rose-400 pointer-events-none" viewBox="0 0 100 100"><polygon points="50,18 88,82 12,82" fill="currentColor"/></svg>
                         </div>
                         <!-- 5. 지방 -->
-                        <div id="sub-lipid" draggable="true" class="substrate-card bg-amber-50 border border-amber-200 p-2.5 sm:p-3 rounded-2xl flex flex-col items-center transition duration-150 animate-pulse" data-match="enzyme-lipase">
+                        <div id="sub-lipid" draggable="true" class="substrate-card bg-amber-50 border border-amber-200 p-3 rounded-2xl flex flex-col items-center cursor-pointer" data-match="enzyme-lipase">
                             <span class="text-2xl select-none">🧈</span>
-                            <span class="font-bold text-[11px] text-amber-950 mt-1 select-none">지방</span>
-                            <svg class="w-6 h-6 mt-1 text-amber-500 pointer-events-none" viewBox="0 0 100 100"><rect x="25" y="25" width="50" height="50" fill="currentColor"/></svg>
+                            <span class="font-bold text-xs text-amber-950 mt-1 select-none">지방</span>
+                            <svg class="w-8 h-8 mt-1.5 text-amber-500 pointer-events-none" viewBox="0 0 100 100"><rect x="25" y="25" width="50" height="50" fill="currentColor"/></svg>
                         </div>
                         <!-- 6. 참기름 -->
-                        <div id="sub-sesame" draggable="true" class="substrate-card bg-amber-50 border border-amber-200 p-2.5 sm:p-3 rounded-2xl flex flex-col items-center transition duration-150" data-match="enzyme-lipase">
+                        <div id="sub-sesame" draggable="true" class="substrate-card bg-amber-50 border border-amber-200 p-3 rounded-2xl flex flex-col items-center cursor-pointer" data-match="enzyme-lipase">
                             <span class="text-2xl select-none">🧴</span>
-                            <span class="font-bold text-[11px] text-amber-950 mt-1 select-none">참기름</span>
-                            <svg class="w-6 h-6 mt-1 text-amber-400 pointer-events-none" viewBox="0 0 100 100"><rect x="25" y="25" width="50" height="50" fill="currentColor"/></svg>
+                            <span class="font-bold text-xs text-amber-950 mt-1 select-none">참기름</span>
+                            <svg class="w-8 h-8 mt-1.5 text-amber-400 pointer-events-none" viewBox="0 0 100 100"><rect x="25" y="25" width="50" height="50" fill="currentColor"/></svg>
                         </div>
                         <!-- 7. 섬유소 -->
-                        <div id="sub-cellulose" draggable="true" class="substrate-card bg-slate-50 border border-slate-200 p-2.5 sm:p-3 rounded-2xl flex flex-col items-center transition duration-150" data-match="none">
+                        <div id="sub-cellulose" draggable="true" class="substrate-card bg-slate-50 border border-slate-200 p-3 rounded-2xl flex flex-col items-center cursor-pointer" data-match="none">
                             <span class="text-2xl select-none">🌿</span>
-                            <span class="font-bold text-[11px] text-slate-900 mt-1 select-none">섬유소</span>
-                            <svg class="w-6 h-6 mt-1 text-slate-400 pointer-events-none" viewBox="0 0 100 100"><polygon points="50,5 64,36 98,36 70,57 81,91 50,70 19,91 30,57 2,36 36,36" fill="currentColor"/></svg>
+                            <span class="font-bold text-xs text-slate-900 mt-1 select-none">섬유소</span>
+                            <svg class="w-8 h-8 mt-1.5 text-slate-400 pointer-events-none" viewBox="0 0 100 100"><polygon points="50,5 64,36 98,36 70,57 81,91 50,70 19,91 30,57 2,36 36,36" fill="currentColor"/></svg>
                         </div>
                     </div>
                 </div>
 
                 <!-- 실시간 피드백 보드 -->
-                <div id="lab-feedback" class="my-2 text-center text-sm font-semibold text-indigo-700 min-h-[20px]">
-                    반응물을 맞는 모양의 효소에 넣어 보세요!
+                <div id="lab-feedback" class="my-4 text-center text-sm font-semibold text-indigo-700 min-h-[20px]">
+                    영양소를 터치한 뒤 결합할 효소를 터치해 매칭해 보세요!
                 </div>
 
                 <!-- 효소 배치 영역 -->
-                <div class="border-t border-slate-100 pt-3">
-                    <h3 class="text-sm font-bold text-slate-500 mb-3 uppercase tracking-wider"><i class="fa-solid fa-circle-nodes mr-1.5"></i>생체 촉매 (효소) - 활성 부위</h3>
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div class="border-t border-slate-100 pt-6">
+                    <h3 class="text-sm font-bold text-slate-500 mb-6 uppercase tracking-wider"><i class="fa-solid fa-circle-nodes mr-1.5"></i>생체 촉매 (효소) - 활성 부위</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
                         
                         <!-- 아밀레이스 (둥근 홈) -->
-                        <div id="enzyme-amylase" class="enzyme-slot bg-slate-50 p-4 rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-between min-h-[140px] relative transition-all">
+                        <div id="enzyme-amylase" class="enzyme-slot bg-slate-50 p-6 rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-between min-h-[180px] relative transition-all cursor-pointer">
                             <div class="text-center select-none">
-                                <span class="font-bold text-xs sm:text-sm text-slate-800 block">아밀레이스</span>
-                                <span class="text-[10px] sm:text-[11px] text-slate-400">녹말 분해 효소</span>
+                                <span class="font-bold text-sm text-slate-800 block">아밀레이스</span>
+                                <span class="text-xs text-slate-400">녹말 분해 효소</span>
                             </div>
-                            <div class="my-1.5 w-12 h-12 rounded-full border-4 border-dashed border-sky-400/40 bg-white flex items-center justify-center slot-receptor">
-                                <span class="text-[10px] sm:text-[11px] text-slate-300">둥근 홈</span>
+                            <div class="my-4 w-16 h-16 rounded-full border-4 border-dashed border-sky-400/40 bg-white flex items-center justify-center slot-receptor">
+                                <span class="text-xs text-slate-300">둥근 홈</span>
                             </div>
-                            <div class="slot-status text-[11px] text-slate-400 font-medium">비어 있음</div>
+                            <div class="slot-status text-xs text-slate-400 font-medium">비어 있음</div>
                         </div>
 
                         <!-- 펩신 (세모 홈) -->
-                        <div id="enzyme-pepsin" class="enzyme-slot bg-slate-50 p-4 rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-between min-h-[140px] relative transition-all">
+                        <div id="enzyme-pepsin" class="enzyme-slot bg-slate-50 p-6 rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-between min-h-[180px] relative transition-all cursor-pointer">
                             <div class="text-center select-none">
-                                <span class="font-bold text-xs sm:text-sm text-slate-800 block">펩신</span>
-                                <span class="text-[10px] sm:text-[11px] text-slate-400">단백질 분해 효소</span>
+                                <span class="font-bold text-sm text-slate-800 block">펩신</span>
+                                <span class="text-xs text-slate-400">단백질 분해 효소</span>
                             </div>
-                            <div class="my-1.5 w-12 h-12 border-4 border-dashed border-rose-400/40 bg-white flex items-center justify-center slot-receptor" style="clip-path: polygon(50% 0%, 0% 100%, 100% 100%);">
-                                <span class="text-[9px] text-slate-300 mt-3">세모 홈</span>
+                            <div class="my-4 w-16 h-16 border-4 border-dashed border-rose-400/40 bg-white flex items-center justify-center slot-receptor" style="clip-path: polygon(50% 0%, 0% 100%, 100% 100%);">
+                                <span class="text-[10px] text-slate-300 mt-4">세모 홈</span>
                             </div>
-                            <div class="slot-status text-[11px] text-slate-400 font-medium">비어 있음</div>
+                            <div class="slot-status text-xs text-slate-400 font-medium">비어 있음</div>
                         </div>
 
                         <!-- 라이페이스 (네모 홈) -->
-                        <div id="enzyme-lipase" class="enzyme-slot bg-slate-50 p-4 rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-between min-h-[140px] relative transition-all">
+                        <div id="enzyme-lipase" class="enzyme-slot bg-slate-50 p-6 rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-between min-h-[180px] relative transition-all cursor-pointer">
                             <div class="text-center select-none">
-                                <span class="font-bold text-xs sm:text-sm text-slate-800 block">라이페이스</span>
-                                <span class="text-[10px] sm:text-[11px] text-slate-400">지방 분해 효소</span>
+                                <span class="font-bold text-sm text-slate-800 block">라이페이스</span>
+                                <span class="text-xs text-slate-400">지방 분해 효소</span>
                             </div>
-                            <div class="my-1.5 w-12 h-12 rounded-lg border-4 border-dashed border-amber-400/40 bg-white flex items-center justify-center slot-receptor">
-                                <span class="text-[10px] sm:text-[11px] text-slate-300">네모 홈</span>
+                            <div class="my-4 w-16 h-16 rounded-lg border-4 border-dashed border-amber-400/40 bg-white flex items-center justify-center slot-receptor">
+                                <span class="text-xs text-slate-300">네모 홈</span>
                             </div>
-                            <div class="slot-status text-[11px] text-slate-400 font-medium">비어 있음</div>
+                            <div class="slot-status text-xs text-slate-400 font-medium">비어 있음</div>
                         </div>
 
                     </div>
                 </div>
 
                 <!-- 반응 진행 마스터 버튼 -->
-                <div class="mt-5 flex justify-center">
-                    <button id="btn-run-reaction" onclick="runReaction()" disabled class="bg-indigo-300 text-white cursor-not-allowed font-bold py-2.5 px-6 rounded-2xl shadow-md transition-all duration-300 text-xs sm:text-sm flex items-center gap-2">
-                        <i class="fa-solid fa-play-circle"></i>화학 반응 진행하기 (생성물 분해 촉진)
+                <div class="mt-8 flex justify-center">
+                    <button id="btn-run-reaction" onclick="runReaction()" disabled class="bg-indigo-300 text-white cursor-not-allowed font-bold py-3.5 px-10 rounded-2xl shadow-md transition-all duration-300 text-base flex items-center gap-2">
+                        <i class="fa-solid fa-play-circle text-lg"></i>화학 반응 진행하기 (생성물 분해 촉진)
                     </button>
                 </div>
 
@@ -224,14 +238,17 @@
         </div>
     </main>
 
-    <footer class="bg-slate-900 text-slate-400 py-2.5 text-center text-[11px]">
-        <p>© 2026 고등학교 통합과학 I - 생체 촉매 디지털 가상 실험실</p>
+    <footer class="bg-slate-900 text-slate-400 py-4 border-t border-slate-800 text-center text-xs">
+        <div class="max-w-7xl mx-auto px-4">
+            <p>© 2026 고등학교 통합과학 I - 생체 촉매 디지털 가상 실험실</p>
+        </div>
     </footer>
 
     <!-- 자바스크립트 프로그램 -->
     <script>
         const matchedState = { 'enzyme-amylase': null, 'enzyme-pepsin': null, 'enzyme-lipase': null };
         let attemptsCount = 0, successCount = 0, createdProductsCount = 0;
+        let selectedSubstrateId = null; // 현재 선택된 기질 ID (모바일 터치 선택용)
 
         // Audio 엔진
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
@@ -255,134 +272,75 @@
             } catch (e) {}
         }
 
-        // --- 모바일 터치 자동 스크롤 제어용 전역 변수 ---
-        let isDragging = false;
-        let lastTouchViewportY = 0;
-        let autoScrollSpeed = 0;
-        let scrollLoopId = null;
-
-        // --- 모바일 터치 및 PC 마우스 드래그 통합 감지 엔진 ---
+        // --- 하이브리드 입력 인터렉션 감지 모듈 ---
         const cards = document.querySelectorAll('.substrate-card');
+        const slots = document.querySelectorAll('.enzyme-slot');
+
         cards.forEach(card => {
-            // 1. PC 환경 마우스 드래그 세팅
+            // 1) 데스크톱 마우스 드래그 이벤트 바인딩
             card.addEventListener('dragstart', (e) => {
                 e.dataTransfer.setData("text", e.target.id);
                 card.classList.add('draggable-active');
             });
             card.addEventListener('dragend', () => card.classList.remove('draggable-active'));
 
-            // 2. 모바일/태블릿 터치 제스처 세팅
-            let startX = 0, startY = 0;
-            let currentX = 0, currentY = 0;
+            // 2) 모바일 및 전체 기기 터치/클릭 탭 선택 기능 바인딩 (최적화 해결책)
+            card.addEventListener('click', (e) => {
+                // 이미 숨겨진(결합된) 카드는 무시
+                if (card.classList.contains('hidden')) return;
 
-            card.addEventListener('touchstart', (e) => {
-                if (e.touches.length > 1) return; // 멀티터치 방지
-                const touch = e.touches[0];
-                
-                // 스크롤 시에도 오차가 생기지 않도록 Page 기준(절대좌표)으로 시작 위치 저장
-                startX = touch.pageX;
-                startY = touch.pageY;
-                
-                isDragging = true;
-                lastTouchViewportY = touch.clientY;
-                autoScrollSpeed = 0;
+                // 기존 선택 해제
+                cards.forEach(c => c.classList.remove('selected-active'));
 
-                card.classList.add('draggable-active');
-                card.style.transition = 'none';
-
-                // 자동 스크롤 루프 시작
-                startAutoScrollLoop(card);
-            }, { passive: false });
-
-            card.addEventListener('touchmove', (e) => {
-                if (!isDragging) return;
-                e.preventDefault(); // 기본 화면 스크롤 철저히 차단
-                
-                const touch = e.touches[0];
-                lastTouchViewportY = touch.clientY; // 현재 뷰포트 기준 Y위치 보존
-
-                // Page 기준 상대 오차 계산
-                currentX = touch.pageX - startX;
-                currentY = touch.pageY - startY;
-                card.style.transform = `translate(${currentX}px, ${currentY}px) scale(1.05)`;
-
-                // 화면 경계선에 닿았는지 판정하여 자동 스크롤 속도 결정
-                const edgeThreshold = 100; // 경계선 크기 (px)
-                if (lastTouchViewportY > window.innerHeight - edgeThreshold) {
-                    // 화면 하단 경계선에 닿으면 아래로 스크롤
-                    autoScrollSpeed = Math.min(12, (lastTouchViewportY - (window.innerHeight - edgeThreshold)) / 4);
-                } else if (lastTouchViewportY < edgeThreshold) {
-                    // 화면 상단 경계선에 닿으면 위로 스크롤
-                    autoScrollSpeed = -Math.min(12, (edgeThreshold - lastTouchViewportY) / 4);
+                if (selectedSubstrateId === card.id) {
+                    // 동일 카드 더블터치 시 해제
+                    selectedSubstrateId = null;
+                    document.getElementById('lab-feedback').innerText = "영양소를 터치한 뒤 결합할 효소를 터치해 매칭해 보세요!";
+                    document.getElementById('lab-feedback').className = "my-4 text-center text-sm font-semibold text-indigo-700 min-h-[20px]";
                 } else {
-                    autoScrollSpeed = 0;
-                }
-            }, { passive: false });
-
-            card.addEventListener('touchend', (e) => {
-                isDragging = false;
-                autoScrollSpeed = 0;
-                stopAutoScrollLoop();
-
-                card.classList.remove('draggable-active');
-                card.style.transition = 'all 0.15s ease';
-                card.style.transform = 'none';
-
-                // 손가락이 떨어진 마지막 위치의 요소를 정확히 탐색
-                const touch = e.changedTouches[0];
-                const targetSlot = findSlotAtPosition(touch.clientX, touch.clientY);
-                
-                if (targetSlot) {
-                    executeMatchLogic(card.id, targetSlot.id);
+                    // 신규 카드 선택 지정
+                    selectedSubstrateId = card.id;
+                    card.classList.add('selected-active');
+                    const subName = card.querySelector('.font-bold').innerText;
+                    document.getElementById('lab-feedback').innerText = `[${subName}] 선택됨. 이 물질을 소화시킬 효소(아래쪽 홈)를 터치하세요!`;
+                    document.getElementById('lab-feedback').className = "my-4 text-center text-sm font-semibold text-indigo-600 min-h-[20px] animate-pulse";
+                    playToneForSelection();
                 }
             });
         });
 
-        // 자동 스크롤 루프 실행기
-        function startAutoScrollLoop(activeCard) {
-            function tick() {
-                if (!isDragging) return;
-                if (autoScrollSpeed !== 0) {
-                    window.scrollBy(0, autoScrollSpeed);
-                    
-                    // 스크롤이 진행될 때 카드의 좌표를 보정하여 손가락에 계속 붙어있게 처리
-                    const currentScrollY = window.scrollY;
-                    const lastTouchPageY = lastTouchViewportY + currentScrollY;
-                    currentY = lastTouchPageY - startY;
-                    activeCard.style.transform = `translate(${currentX}px, ${currentY}px) scale(1.05)`;
-                }
-                scrollLoopId = requestAnimationFrame(tick);
-            }
-            scrollLoopId = requestAnimationFrame(tick);
-        }
-
-        function stopAutoScrollLoop() {
-            if (scrollLoopId) {
-                cancelAnimationFrame(scrollLoopId);
-                scrollLoopId = null;
-            }
-        }
-
-        // PC 마우스 드롭 구역 활성화
-        document.querySelectorAll('.enzyme-slot').forEach(slot => {
+        // 효소 홈 터치/클릭 이벤트 바인딩
+        slots.forEach(slot => {
+            // 마우스 드롭 구역 기능 활성화
             slot.addEventListener('dragover', (e) => e.preventDefault());
             slot.addEventListener('drop', (e) => {
                 e.preventDefault();
                 const cardId = e.dataTransfer.getData("text");
                 executeMatchLogic(cardId, slot.id);
             });
+
+            // 터치/클릭 매칭 연동
+            slot.addEventListener('click', () => {
+                if (selectedSubstrateId) {
+                    executeMatchLogic(selectedSubstrateId, slot.id);
+                    // 결합 후 선택 상태값 즉각 리셋
+                    cards.forEach(c => c.classList.remove('selected-active'));
+                    selectedSubstrateId = null;
+                }
+            });
         });
 
-        // 주어진 화면 좌표 아래에 효소 슬롯(드롭존)이 있는지 확인하는 기하학적 판정 기능
-        function findSlotAtPosition(x, y) {
-            const slots = document.querySelectorAll('.enzyme-slot');
-            for (let slot of slots) {
-                const rect = slot.getBoundingClientRect();
-                if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
-                    return slot;
-                }
-            }
-            return null;
+        // 탭 피드백용 가벼운 알림음
+        function playToneForSelection() {
+            try {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain); gain.connect(audioCtx.destination);
+                osc.type = 'sine'; osc.frequency.setValueAtTime(330, audioCtx.currentTime);
+                gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+                gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
+                osc.start(); osc.stop(audioCtx.currentTime + 0.15);
+            } catch(e) {}
         }
 
         // 공통 기질 특이성 매칭 처리
@@ -396,7 +354,7 @@
 
             if (matchedState[slotId] !== null) {
                 document.getElementById('lab-feedback').innerText = "해당 효소에는 이미 다른 영양소가 결합해 있습니다.";
-                document.getElementById('lab-feedback').className = "my-3 text-center text-sm font-semibold text-rose-500";
+                document.getElementById('lab-feedback').className = "my-4 text-center text-sm font-semibold text-rose-500 min-h-[20px]";
                 playSound('error');
                 return;
             }
@@ -414,17 +372,17 @@
 
                 const receptor = slot.querySelector('.slot-receptor');
                 if (receptor) {
-                    receptor.className = "my-2 w-14 h-14 bg-emerald-400 rounded-xl flex items-center justify-center text-white font-bold transition duration-300 animate-bounce slot-receptor";
+                    receptor.className = "my-4 w-16 h-16 bg-emerald-400 rounded-xl flex items-center justify-center text-white font-bold transition duration-300 animate-bounce slot-receptor";
                     const emoji = card.querySelector('span').innerText;
-                    receptor.innerHTML = `<span class="text-xl">${emoji}</span>`;
+                    receptor.innerHTML = `<span class="text-2xl">${emoji}</span>`;
                 }
 
                 document.getElementById('lab-feedback').innerText = `정답! ${card.querySelector('.font-bold').innerText}이(가) 알맞은 효소 활성 부위에 결합했습니다.`;
-                document.getElementById('lab-feedback').className = "my-3 text-center text-sm font-semibold text-emerald-600";
+                document.getElementById('lab-feedback').className = "my-4 text-center text-sm font-semibold text-emerald-600 min-h-[20px]";
                 playSound('success');
             } else {
                 document.getElementById('lab-feedback').innerText = "구조가 맞지 않아 결합할 수 없습니다 (기질 특이성 원리).";
-                document.getElementById('lab-feedback').className = "my-3 text-center text-sm font-semibold text-rose-500";
+                document.getElementById('lab-feedback').className = "my-4 text-center text-sm font-semibold text-rose-500 min-h-[20px]";
                 playSound('error');
             }
             updateDashboard();
@@ -445,10 +403,10 @@
             const btn = document.getElementById('btn-run-reaction');
             if (hasMatches) {
                 btn.removeAttribute('disabled');
-                btn.className = "bg-indigo-600 hover:bg-indigo-700 hover:scale-105 text-white font-bold py-3 px-8 rounded-2xl shadow-md cursor-pointer transition-all duration-300 text-sm flex items-center gap-2";
+                btn.className = "bg-indigo-600 hover:bg-indigo-700 hover:scale-105 text-white font-bold py-3.5 px-10 rounded-2xl shadow-md cursor-pointer transition-all duration-300 text-base flex items-center gap-2";
             } else {
                 btn.setAttribute('disabled', 'true');
-                btn.className = "bg-indigo-300 text-white cursor-not-allowed font-bold py-3 px-8 rounded-2xl shadow-md transition-all duration-300 text-sm flex items-center gap-2";
+                btn.className = "bg-indigo-300 text-white cursor-not-allowed font-bold py-3.5 px-10 rounded-2xl shadow-md transition-all duration-300 text-base flex items-center gap-2";
             }
         }
 
@@ -462,8 +420,8 @@
                     const slot = document.getElementById(slotId);
                     const receptor = slot.querySelector('.slot-receptor');
 
-                    const p1 = document.createElement('div'); p1.className = "absolute text-xl split-product-left z-40"; p1.innerText = getProductPieces(subId)[0]; p1.style.left = `${receptor.offsetLeft + 10}px`; p1.style.top = `${receptor.offsetTop + 10}px`; slot.appendChild(p1);
-                    const p2 = document.createElement('div'); p2.className = "absolute text-xl split-product-right z-40"; p2.innerText = getProductPieces(subId)[1]; p2.style.left = `${receptor.offsetLeft + 10}px`; p2.style.top = `${receptor.offsetTop + 10}px`; slot.appendChild(p2);
+                    const p1 = document.createElement('div'); p1.className = "absolute text-2xl split-product-left z-40"; p1.innerText = getProductPieces(subId)[0]; p1.style.left = `${receptor.offsetLeft + 10}px`; p1.style.top = `${receptor.offsetTop + 10}px`; slot.appendChild(p1);
+                    const p2 = document.createElement('div'); p2.className = "absolute text-2xl split-product-right z-40"; p2.innerText = getProductPieces(subId)[1]; p2.style.left = `${receptor.offsetLeft + 10}px`; p2.style.top = `${receptor.offsetTop + 10}px`; slot.appendChild(p2);
 
                     createdProductsCount += 2;
 
@@ -497,18 +455,19 @@
         function restoreReceptor(slotId, receptor) {
             if (!receptor) return; receptor.removeAttribute('style');
             if (slotId === 'enzyme-amylase') {
-                receptor.className = "my-2 w-14 h-14 rounded-full border-4 border-dashed border-sky-400/40 bg-white flex items-center justify-center slot-receptor"; receptor.innerHTML = '<span class="text-[11px] text-slate-300">둥근 홈</span>';
+                receptor.className = "my-4 w-16 h-16 rounded-full border-4 border-dashed border-sky-400/40 bg-white flex items-center justify-center slot-receptor"; receptor.innerHTML = '<span class="text-xs text-slate-300">둥근 홈</span>';
             } else if (slotId === 'enzyme-pepsin') {
-                receptor.className = "my-2 w-14 h-14 border-4 border-dashed border-rose-400/40 bg-white flex items-center justify-center slot-receptor"; receptor.setAttribute('style', 'clip-path: polygon(50% 0%, 0% 100%, 100% 100%);'); receptor.innerHTML = '<span class="text-[10px] text-slate-300 mt-4">세모 홈</span>';
+                receptor.className = "my-4 w-16 h-16 border-4 border-dashed border-rose-400/40 bg-white flex items-center justify-center slot-receptor"; receptor.setAttribute('style', 'clip-path: polygon(50% 0%, 0% 100%, 100% 100%);'); receptor.innerHTML = '<span class="text-[10px] text-slate-300 mt-4">세모 홈</span>';
             } else if (slotId === 'enzyme-lipase') {
-                receptor.className = "my-2 w-14 h-14 rounded-lg border-4 border-dashed border-amber-400/40 bg-white flex items-center justify-center slot-receptor"; receptor.innerHTML = '<span class="text-[11px] text-slate-300">네모 홈</span>';
+                receptor.className = "my-4 w-16 h-16 rounded-lg border-4 border-dashed border-amber-400/40 bg-white flex items-center justify-center slot-receptor"; receptor.innerHTML = '<span class="text-xs text-slate-300">네모 홈</span>';
             }
         }
 
         // 실험 초기화
         function resetLab() {
             attemptsCount = 0; successCount = 0; createdProductsCount = 0;
-            document.querySelectorAll('.substrate-card').forEach(card => card.classList.remove('hidden'));
+            selectedSubstrateId = null;
+            document.querySelectorAll('.substrate-card').forEach(card => card.classList.remove('hidden', 'selected-active'));
             Object.keys(matchedState).forEach(slotId => {
                 const slot = document.getElementById(slotId);
                 restoreReceptor(slotId, slot.querySelector('.slot-receptor'));
@@ -517,7 +476,7 @@
                 matchedState[slotId] = null;
             });
             document.getElementById('lab-feedback').innerText = "실험실이 초기화되었습니다. 반응물을 결합해 보세요!";
-            document.getElementById('lab-feedback').className = "my-3 text-center text-sm font-semibold text-indigo-700";
+            document.getElementById('lab-feedback').className = "my-4 text-center text-sm font-semibold text-indigo-700 min-h-[20px]";
             checkMasterButton(); updateDashboard();
         }
     </script>
