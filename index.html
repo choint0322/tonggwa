@@ -4,216 +4,534 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bio-Lab: 물질대사와 효소 가상 실험실</title>
+    <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome 아이콘 CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Fonts (Noto Sans KR & Montserrat) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Noto Sans KR', 'Poppins', sans-serif; }
-        .drag-over { border-color: #4f46e5 !important; background-color: #f5f3ff !important; scale: 1.02; }
-        @keyframes break-effect {
-            0% { transform: scale(1); opacity: 1; filter: hue-rotate(0deg); }
-            50% { transform: scale(1.1); opacity: 0.8; filter: hue-rotate(90deg); }
-            100% { transform: scale(0.8); opacity: 0; filter: hue-rotate(180deg); }
+        body {
+            font-family: 'Noto Sans KR', 'Montserrat', sans-serif;
+            background-color: #f8fafc;
         }
-        .product-break { animation: break-effect 0.6s ease-out forwards; }
+        /* 드래그 및 애니메이션 효과를 위한 스타일 */
+        .draggable-active {
+            transform: scale(1.05);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        .correct-glow {
+            animation: successGlow 1s ease-in-out infinite alternate;
+        }
+        @keyframes successGlow {
+            from { box-shadow: 0 0 5px rgba(74, 222, 128, 0.5); }
+            to { box-shadow: 0 0 20px rgba(74, 222, 128, 0.9); }
+        }
+        /* 생성물 분해 애니메이션 */
+        @keyframes splitLeft {
+            0% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+            100% { transform: translate(-80px, -40px) rotate(-15deg); opacity: 0.9; }
+        }
+        @keyframes splitRight {
+            0% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+            100% { transform: translate(80px, -40px) rotate(15deg); opacity: 0.9; }
+        }
+        .split-product-left {
+            animation: splitLeft 1s forwards cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        .split-product-right {
+            animation: splitRight 1s forwards cubic-bezier(0.25, 1, 0.5, 1);
+        }
     </style>
 </head>
-<body class="bg-slate-50 min-h-screen flex flex-col justify-between">
+<body class="min-h-screen flex flex-col justify-between">
 
-    <header class="bg-gradient-to-r from-indigo-900 via-indigo-800 to-slate-900 text-white py-8 px-6 shadow-md text-center relative overflow-hidden">
-        <div class="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
-            <div class="absolute inset-0" style="background-image: linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px); background-size: 40px 40px;"></div>
-        </div>
-        <div class="max-w-4xl mx-auto relative z-10">
-            <div class="inline-block bg-indigo-500/30 text-indigo-300 border border-indigo-500/50 text-xs px-3 py-1 rounded-full font-semibold uppercase tracking-wider mb-2">
-                2022 개정 교육과정 반영
+    <!-- 네비게이션 헤더 (탭 스위처를 없애고 타이틀을 중앙 정렬로 배치) -->
+    <header class="bg-indigo-900 text-white shadow-lg py-5 px-6 sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="bg-gradient-to-tr from-amber-400 to-amber-300 p-2.5 rounded-xl text-indigo-900 shadow-md">
+                    <i class="fa-solid fa-flask-vial text-2xl animate-pulse"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl sm:text-2xl font-bold tracking-tight">III. 생명 시스템 - 물질대사와 효소 가상 실험실</h1>
+                    <p class="text-xs text-indigo-200">2022 개정 교육과정 고등학교 통합과학 I | 기질 특이성 탐구</p>
+                </div>
             </div>
-            <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight">III. 생명 시스템 - 물질대사와 효소</h1>
-            <p class="text-indigo-200 text-xs sm:text-sm mt-1 max-w-xl mx-auto font-light">
-                다양한 기질을 드래그하여 효소의 활성 부위와 입체 구조를 맞추어보며, 기질 특이성의 원리를 탐구해 봅시다.
-            </p>
+            <div class="bg-indigo-950/80 px-4 py-2 rounded-xl border border-indigo-800 text-xs font-semibold text-amber-400">
+                <i class="fa-solid fa-circle-check mr-1"></i> 학생 개별 참여형 디지털 탐구 공간
+            </div>
         </div>
     </header>
 
-    <main class="flex-grow max-w-7xl w-full mx-auto p-6 grid grid-cols-1 lg:grid-cols-12 gap-8">
-        
-        <section class="lg:col-span-5 bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex flex-col justify-between">
-            <div>
-                <h2 class="text-lg font-bold text-slate-800 mb-2">
-                    <i class="fa-solid fa-boxes-stacked text-indigo-600 mr-2"></i>기질 저장고 (Substrates)
-                </h2>
-                <p class="text-xs text-slate-500 mb-6 leading-relaxed">
-                    다양한 영양소와 물질들이 준비되어 있습니다. 마우스나 손가락으로 꾹 눌러 우측 효소의 활성 부위로 드래그해 보세요.
-                </p>
-                
-                <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-2 gap-3" id="substrates-container">
-                    <div id="sub-beef" draggable="true" ondragstart="drag(event)" class="bg-amber-50 hover:bg-amber-100/80 border border-amber-200/60 p-3 rounded-xl cursor-grab active:cursor-grabbing shadow-sm flex flex-col items-center transition duration-200 group" data-shape="triangle" data-name="소고기 단백질">
-                        <span class="text-2xl mb-1 group-hover:scale-110 transition">🥩</span>
-                        <span class="text-xs font-bold text-slate-700">소고기 단백질</span>
-                        <span class="text-[10px] bg-amber-200/50 text-amber-800 px-1.5 py-0.5 rounded mt-1 font-medium">세모 결합구조</span>
-                    </div>
-
-                    <div id="sub-collagen" draggable="true" ondragstart="drag(event)" class="bg-orange-50 hover:bg-orange-100/80 border border-orange-200/60 p-3 rounded-xl cursor-grab active:cursor-grabbing shadow-sm flex flex-col items-center transition duration-200 group" data-shape="triangle" data-name="콜라겐 단백질">
-                        <span class="text-2xl mb-1 group-hover:scale-110 transition">🦴</span>
-                        <span class="text-xs font-bold text-slate-700">콜라겐 단백질</span>
-                        <span class="text-[10px] bg-orange-200/50 text-orange-800 px-1.5 py-0.5 rounded mt-1 font-medium">세모 결합구조</span>
-                    </div>
-
-                    <div id="sub-starch" draggable="true" ondragstart="drag(event)" class="bg-yellow-50 hover:bg-yellow-100/80 border border-yellow-200/60 p-3 rounded-xl cursor-grab active:cursor-grabbing shadow-sm flex flex-col items-center transition duration-200 group" data-shape="circle" data-name="감자 녹말">
-                        <span class="text-2xl mb-1 group-hover:scale-110 transition">🥔</span>
-                        <span class="text-xs font-bold text-slate-700">감자 녹말</span>
-                        <span class="text-[10px] bg-yellow-200/50 text-yellow-800 px-1.5 py-0.5 rounded mt-1 font-medium">둥근 결합구조</span>
-                    </div>
-
-                    <div id="sub-glycogen" draggable="true" ondragstart="drag(event)" class="bg-red-50 hover:bg-red-100/80 border border-red-200/60 p-3 rounded-xl cursor-grab active:cursor-grabbing shadow-sm flex flex-col items-center transition duration-200 group" data-shape="circle" data-name="간 글리코젠">
-                        <span class="text-2xl mb-1 group-hover:scale-110 transition">🧬</span>
-                        <span class="text-xs font-bold text-slate-700">간 글리코젠</span>
-                        <span class="text-[10px] bg-red-200/50 text-red-800 px-1.5 py-0.5 rounded mt-1 font-medium">둥근 결합구조</span>
-                    </div>
-
-                    <div id="sub-fat" draggable="true" ondragstart="drag(event)" class="bg-pink-50 hover:bg-pink-100/80 border border-pink-200/60 p-3 rounded-xl cursor-grab active:cursor-grabbing shadow-sm flex flex-col items-center transition duration-200 group" data-shape="square" data-name="삼겹살 지방">
-                        <span class="text-2xl mb-1 group-hover:scale-110 transition">🥓</span>
-                        <span class="text-xs font-bold text-slate-700">삼겹살 지방</span>
-                        <span class="text-[10px] bg-pink-200/50 text-pink-800 px-1.5 py-0.5 rounded mt-1 font-medium">네모 결합구조</span>
-                    </div>
-
-                    <div id="sub-lipid" draggable="true" ondragstart="drag(event)" class="bg-amber-50 hover:bg-amber-100/80 border border-amber-200/60 p-3 rounded-xl cursor-grab active:cursor-grabbing shadow-sm flex flex-col items-center transition duration-200 group" data-shape="square" data-name="식용유 지질">
-                        <span class="text-2xl mb-1 group-hover:scale-110 transition">🍾</span>
-                        <span class="text-xs font-bold text-slate-700">식용유 지질</span>
-                        <span class="text-[10px] bg-amber-200/50 text-amber-800 px-1.5 py-0.5 rounded mt-1 font-medium">네모 결합구조</span>
-                    </div>
-
-                    <div id="sub-straw" draggable="true" ondragstart="drag(event)" class="bg-slate-100 hover:bg-slate-200/80 border border-slate-300 p-3 rounded-xl cursor-grab active:cursor-grabbing shadow-sm flex flex-col items-center transition duration-200 group" data-shape="star" data-name="플라스틱 빨대">
-                        <span class="text-2xl mb-1 group-hover:scale-110 transition">🥤</span>
-                        <span class="text-xs font-bold text-slate-500">플라스틱 빨대</span>
-                        <span class="text-[10px] bg-slate-200 text-slate-600 px-1.5 py-0.5 rounded mt-1 font-medium">이상한 구조</span>
+    <!-- 메인 콘텐츠 영역 (PC 가로 레이아웃 고정 12열 구조) -->
+    <main class="flex-grow max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            <!-- 실험실 설명 및 상태판 (좌측 4열) -->
+            <div class="lg:col-span-4 flex flex-col gap-6">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
+                    <span class="bg-amber-100 text-amber-800 text-xs font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">가상 실험 01</span>
+                    <h2 class="text-2xl font-bold mt-2 text-slate-800">기질 특이성 확인하기</h2>
+                    <p class="text-slate-600 mt-2 text-sm leading-relaxed">
+                        효소는 단백질로 이루어진 생체 촉매로, 각자 고유한 입체 구조를 가집니다. 아래에 있는 다양한 반응물(기질)을 알맞은 모양의 효소에 드래그하여 결합시켜 보세요!
+                    </p>
+                    
+                    <!-- 미션 안내판 -->
+                    <div class="mt-5 p-4 bg-indigo-50 rounded-xl border border-indigo-100">
+                        <h4 class="font-bold text-indigo-900 text-sm"><i class="fa-solid fa-circle-info mr-1.5"></i>실험 가이드</h4>
+                        <ul class="text-xs text-indigo-950 mt-2 space-y-1.5 list-disc pl-4">
+                            <li>알맞은 영양소(기질)를 드래그하여 효소 활성 부위에 올려놓으세요.</li>
+                            <li>동일한 효소(활성부위 모양)에 결합하는 여러 종류의 기질을 찾아보세요.</li>
+                            <li>모양이 맞지 않으면 결합하지 않고 튕겨 나갑니다.</li>
+                            <li>결합 성공 후 <strong>[화학 반응 진행하기]</strong> 버튼이 활성화됩니다.</li>
+                        </ul>
                     </div>
                 </div>
-            </div>
 
-            <div id="msg-board" class="mt-6 bg-slate-900 text-emerald-400 p-4 rounded-xl font-mono text-xs min-h-[70px] flex items-center shadow-inner border border-slate-800">
-                ⚡ [시스템] 가상 실험실 작동 준비 완료. 기질을 선택해 위장 속 주효소인 '펩신'으로 드래그하세요.
-            </div>
-        </section>
-
-        <section class="lg:col-span-7 bg-white rounded-2xl p-6 shadow-sm border border-slate-100 flex flex-col justify-between">
-            <div>
-                <h2 class="text-lg font-bold text-slate-800 mb-1">
-                    <i class="fa-solid fa-wand-magic-sparkles text-indigo-600 mr-2"></i>위장 속 생체 촉매 실험실
-                </h2>
-                <p class="text-xs text-slate-500 mb-6">
-                    우리 몸의 위에서 분비되는 소화 효소인 <strong>펩신(Pepsin)</strong>의 입체 활성 부위 모델입니다.
-                </p>
-
-                <div class="bg-gradient-to-b from-indigo-50 to-slate-50 border-2 border-dashed border-slate-200 rounded-2xl p-8 flex flex-col items-center justify-center min-h-[280px] relative transition-all duration-300" id="enzyme-dropzone" ondragover="allowDrop(event)" ondragleave="handleDragLeave(event)" ondrop="drop(event)">
-                    
-                    <div id="enzyme-body" class="bg-indigo-600 text-white w-64 h-40 rounded-3xl flex flex-col items-center justify-start pt-4 shadow-lg relative border-4 border-indigo-700 transition duration-300">
-                        <span class="font-bold text-sm tracking-wider uppercase opacity-90"><i class="fa-solid fa-scissors mr-1"></i> 소화 효소: 펩신</span>
-                        <span class="text-[10px] text-indigo-200 bg-indigo-800/50 px-2 py-0.5 rounded-full mt-1">Pepsin Body</span>
-
-                        <div class="absolute -top-6 left-1/2 -translate-x-1/2 w-16 h-10 bg-gradient-to-b from-indigo-50 to-indigo-100 border-b-4 border-indigo-600 transition duration-300" style="clip-path: polygon(50% 100%, 0 0, 100% 0);" id="active-site"></div>
-                        <div class="absolute -top-12 left-1/2 -translate-x-1/2 text-[10px] font-bold text-indigo-600 bg-white border border-indigo-200 px-2 py-0.5 rounded-full shadow-sm">
-                            ▼ 활성 부위(세모)
+                <!-- 실시간 실험 현황 대시보드 -->
+                <div class="bg-slate-900 text-white p-6 rounded-2xl shadow-md">
+                    <h3 class="text-lg font-bold text-slate-200 border-b border-slate-800 pb-3"><i class="fa-solid fa-chart-bar mr-2 text-amber-400"></i>실험 데이터 보드</h3>
+                    <div class="mt-4 space-y-3 text-sm">
+                        <div class="flex justify-between">
+                            <span class="text-slate-400">결합 성공률:</span>
+                            <span id="stat-accuracy" class="font-bold text-amber-400">0%</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-400">생성된 물질 수:</span>
+                            <span id="stat-products" class="font-bold text-emerald-400">0개</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-slate-400">효소 상태 (재사용성):</span>
+                            <span class="font-bold text-sky-400">영구적 불변 (재사용 가능)</span>
                         </div>
                     </div>
-
-                    <p id="dropzone-text" class="text-xs text-slate-400 font-medium mt-6 pointer-events-none">
-                        <i class="fa-solid fa-hand-pointer animate-bounce mr-1"></i> 여기에 기질 카드를 내려놓으세요.
-                    </p>
+                    <button onclick="resetLab()" class="w-full mt-5 bg-slate-800 hover:bg-slate-700 text-white font-medium py-2.5 px-4 rounded-xl text-xs transition border border-slate-700">
+                        <i class="fa-solid fa-rotate-right mr-1.5"></i>실험 초기화
+                    </button>
                 </div>
             </div>
 
-            <div class="flex gap-3 mt-6">
-                <button onclick="resetLab()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 px-4 rounded-xl text-xs transition flex items-center justify-center gap-2 border border-slate-200 shadow-sm">
-                    <i class="fa-solid fa-rotate-right"></i> 실험실 상태 초기화
-                </button>
-            </div>
-        </section>
+            <!-- 가상 실험 공간 (우측 8열) -->
+            <div class="lg:col-span-8 bg-white p-6 sm:p-8 rounded-3xl shadow-sm border border-slate-100 flex flex-col justify-between min-h-[550px] relative overflow-hidden">
+                
+                <!-- 영양소 기질 카드 배치 영역 (출발지) -->
+                <div>
+                    <h3 class="text-sm font-bold text-slate-500 mb-4 uppercase tracking-wider"><i class="fa-solid fa-box-open mr-1.5"></i>반응물 (기질) - 드래그하거나 터치하세요</h3>
+                    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3" id="substrates-container">
+                        <!-- 1. 녹말 (둥근 짝 1) -->
+                        <div id="sub-starch" draggable="true" ondragstart="drag(event)" class="substrate-card cursor-grab bg-sky-50 hover:bg-sky-100 border border-sky-200 p-3 rounded-2xl flex flex-col items-center transition duration-200" data-match="enzyme-amylase">
+                            <span class="text-2xl animate-bounce">🍞</span>
+                            <span class="font-bold text-xs text-sky-950 mt-1">녹말</span>
+                            <svg class="w-8 h-8 mt-1.5 text-sky-500" viewBox="0 0 100 100">
+                                <circle cx="50" cy="50" r="22" fill="currentColor"/>
+                            </svg>
+                        </div>
+                        <!-- 2. 글리코젠 (둥근 짝 2) -->
+                        <div id="sub-glycogen" draggable="true" ondragstart="drag(event)" class="substrate-card cursor-grab bg-sky-50 hover:bg-sky-100 border border-sky-200 p-3 rounded-2xl flex flex-col items-center transition duration-200" data-match="enzyme-amylase">
+                            <span class="text-2xl">🍚</span>
+                            <span class="font-bold text-xs text-sky-950 mt-1">글리코젠</span>
+                            <svg class="w-8 h-8 mt-1.5 text-sky-400" viewBox="0 0 100 100">
+                                <circle cx="35" cy="50" r="14" fill="currentColor"/>
+                                <circle cx="65" cy="50" r="14" fill="currentColor"/>
+                                <circle cx="50" cy="35" r="10" fill="currentColor"/>
+                            </svg>
+                        </div>
+                        <!-- 3. 단백질 (세모 짝 1) -->
+                        <div id="sub-protein" draggable="true" ondragstart="drag(event)" class="substrate-card cursor-grab bg-rose-50 hover:bg-rose-100 border border-rose-200 p-3 rounded-2xl flex flex-col items-center transition duration-200" data-match="enzyme-pepsin">
+                            <span class="text-2xl">🥩</span>
+                            <span class="font-bold text-xs text-rose-950 mt-1">단백질</span>
+                            <svg class="w-8 h-8 mt-1.5 text-rose-500" viewBox="0 0 100 100">
+                                <polygon points="50,18 88,82 12,82" fill="currentColor"/>
+                            </svg>
+                        </div>
+                        <!-- 4. 콜라겐 (세모 짝 2) -->
+                        <div id="sub-collagen" draggable="true" ondragstart="drag(event)" class="substrate-card cursor-grab bg-rose-50 hover:bg-rose-100 border border-rose-200 p-3 rounded-2xl flex flex-col items-center transition duration-200" data-match="enzyme-pepsin">
+                            <span class="text-2xl">🦴</span>
+                            <span class="font-bold text-xs text-rose-950 mt-1">콜라겐</span>
+                            <svg class="w-8 h-8 mt-1.5 text-rose-400" viewBox="0 0 100 100">
+                                <polygon points="50,10 95,50 50,90 5,50" fill="none" stroke="currentColor" stroke-width="12"/>
+                                <polygon points="50,22 82,50 50,78 18,50" fill="currentColor"/>
+                            </svg>
+                        </div>
+                        <!-- 5. 지방 (네모 짝 1) -->
+                        <div id="sub-lipid" draggable="true" ondragstart="drag(event)" class="substrate-card cursor-grab bg-amber-50 hover:bg-amber-100 border border-amber-200 p-3 rounded-2xl flex flex-col items-center transition duration-200" data-match="enzyme-lipase">
+                            <span class="text-2xl">🧈</span>
+                            <span class="font-bold text-xs text-amber-950 mt-1">지방</span>
+                            <svg class="w-8 h-8 mt-1.5 text-amber-500" viewBox="0 0 100 100">
+                                <rect x="25" y="25" width="50" height="50" fill="currentColor"/>
+                            </svg>
+                        </div>
+                        <!-- 6. 참기름 (네모 짝 2) -->
+                        <div id="sub-sesame" draggable="true" ondragstart="drag(event)" class="substrate-card cursor-grab bg-amber-50 hover:bg-amber-100 border border-amber-200 p-3 rounded-2xl flex flex-col items-center transition duration-200" data-match="enzyme-lipase">
+                            <span class="text-2xl">🧴</span>
+                            <span class="font-bold text-xs text-amber-950 mt-1">참기름</span>
+                            <svg class="w-8 h-8 mt-1.5 text-amber-400" viewBox="0 0 100 100">
+                                <rect x="35" y="20" width="30" height="60" rx="6" fill="currentColor"/>
+                            </svg>
+                        </div>
+                        <!-- 7. 섬유소 (방해 물질 - 별 모양) -->
+                        <div id="sub-cellulose" draggable="true" ondragstart="drag(event)" class="substrate-card cursor-grab bg-slate-50 hover:bg-slate-100 border border-slate-200 p-3 rounded-2xl flex flex-col items-center transition duration-200" data-match="none">
+                            <span class="text-2xl">🌿</span>
+                            <span class="font-bold text-xs text-slate-900 mt-1">섬유소</span>
+                            <svg class="w-8 h-8 mt-1.5 text-slate-400" viewBox="0 0 100 100">
+                                <polygon points="50,5 64,36 98,36 70,57 81,91 50,70 19,91 30,57 2,36 36,36" fill="currentColor"/>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
 
+                <!-- 실시간 피드백 한 줄 메세지 -->
+                <div id="lab-feedback" class="my-4 text-center text-sm font-semibold text-indigo-700 min-h-[20px]">
+                    반응물을 맞는 모양의 효소에 넣어 보세요!
+                </div>
+
+                <!-- 효소 배치 영역 (목적지) -->
+                <div class="border-t border-slate-100 pt-6">
+                    <h3 class="text-sm font-bold text-slate-500 mb-6 uppercase tracking-wider"><i class="fa-solid fa-circle-nodes mr-1.5"></i>생체 촉매 (효소) - 활성 부위</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+                        
+                        <!-- 아밀레이스 (둥근 홈) -->
+                        <div id="enzyme-amylase" ondragover="allowDrop(event)" ondrop="drop(event)" class="enzyme-slot bg-slate-50 p-6 rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-between min-h-[180px] transition-all relative">
+                            <div class="text-center">
+                                <span class="font-bold text-sm text-slate-800 block">아밀레이스</span>
+                                <span class="text-xs text-slate-400">녹말/다당류 분해 효소</span>
+                            </div>
+                            <!-- 홈 디자인 -->
+                            <div class="my-4 w-16 h-16 rounded-full border-4 border-dashed border-sky-400/40 bg-white flex items-center justify-center slot-receptor">
+                                <span class="text-xs text-slate-300">둥근 홈</span>
+                            </div>
+                            <div class="slot-status text-xs text-slate-400 font-medium">비어 있음</div>
+                        </div>
+
+                        <!-- 펩신 (세모 홈) -->
+                        <div id="enzyme-pepsin" ondragover="allowDrop(event)" ondrop="drop(event)" class="enzyme-slot bg-slate-50 p-6 rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-between min-h-[180px] transition-all relative">
+                            <div class="text-center">
+                                <span class="font-bold text-sm text-slate-800 block">펩신</span>
+                                <span class="text-xs text-slate-400">단백질 분해 효소</span>
+                            </div>
+                            <!-- 홈 디자인 -->
+                            <div class="my-4 w-16 h-16 border-4 border-dashed border-rose-400/40 bg-white flex items-center justify-center slot-receptor" style="clip-path: polygon(50% 0%, 0% 100%, 100% 100%);">
+                                <span class="text-[10px] text-slate-300 mt-4">세모 홈</span>
+                            </div>
+                            <div class="slot-status text-xs text-slate-400 font-medium">비어 있음</div>
+                        </div>
+
+                        <!-- 라이페이스 (네모 홈) -->
+                        <div id="enzyme-lipase" ondragover="allowDrop(event)" ondrop="drop(event)" class="enzyme-slot bg-slate-50 p-6 rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-between min-h-[180px] transition-all relative">
+                            <div class="text-center">
+                                <span class="font-bold text-sm text-slate-800 block">라이페이스</span>
+                                <span class="text-xs text-slate-400">지방/지질 분해 효소</span>
+                            </div>
+                            <!-- 홈 디자인 -->
+                            <div class="my-4 w-16 h-16 rounded-lg border-4 border-dashed border-amber-400/40 bg-white flex items-center justify-center slot-receptor">
+                                <span class="text-xs text-slate-300">네모 홈</span>
+                            </div>
+                            <div class="slot-status text-xs text-slate-400 font-medium">비어 있음</div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- 반응 진행 마스터 버튼 -->
+                <div class="mt-8 flex justify-center">
+                    <button id="btn-run-reaction" onclick="runReaction()" disabled class="bg-indigo-300 text-white cursor-not-allowed font-bold py-3.5 px-10 rounded-2xl shadow-md transition-all duration-300 text-base flex items-center gap-2">
+                        <i class="fa-solid fa-play-circle text-lg"></i>화학 반응 진행하기 (활성화 에너지 감소)
+                    </button>
+                </div>
+
+            </div>
+        </div>
     </main>
 
-    <footer class="bg-slate-900 text-slate-400 py-4 border-t border-slate-800 text-center text-[11px]">
-        <p>© 2026 고등학교 통합과학 I - 생체 촉매 디지털 가상 실험실</p>
+    <!-- 푸터 정보 영역 -->
+    <footer class="bg-slate-900 text-slate-400 py-4 border-t border-slate-800 text-center text-xs">
+        <div class="max-w-7xl mx-auto px-4">
+            <p>© 2026 고등학교 통합과학 I - 생체 촉매 디지털 가상 실험실</p>
+        </div>
     </footer>
 
+    <!-- 자바스크립트 프로그램 -->
     <script>
-        // 사운드 시스템 (모바일 및 PC 호환 Web Audio API)
+        // 현재 매칭 성공 상태
+        const matchedState = {
+            'enzyme-amylase': null,
+            'enzyme-pepsin': null,
+            'enzyme-lipase': null
+        };
+        
+        let attemptsCount = 0;
+        let successCount = 0;
+        let createdProductsCount = 0;
+
+        // Web Audio API를 활용한 효과음 생성기 (아날로그 정답/오답음)
         const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        function playTone(freq, type, duration) {
+
+        function playSound(type) {
             try {
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
-                osc.type = type;
-                osc.frequency.value = freq;
-                gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + duration);
                 osc.connect(gain);
                 gain.connect(audioCtx.destination);
-                osc.start();
-                osc.stop(audioCtx.currentTime + duration);
-            } catch(e) { console.log("Audio play error"); }
+
+                if (type === 'success') {
+                    // 상행 멜로디 (도 - 미 - 솔)
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(523.25, audioCtx.currentTime); // C5
+                    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                    osc.start();
+                    osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1); // E5
+                    osc.frequency.setValueAtTime(783.99, audioCtx.currentTime + 0.2); // G5
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+                    osc.stop(audioCtx.currentTime + 0.4);
+                } else if (type === 'error') {
+                    // 낮은 부저음
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(150.00, audioCtx.currentTime);
+                    gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+                    osc.start();
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                    osc.stop(audioCtx.currentTime + 0.3);
+                } else if (type === 'reaction') {
+                    // 보글보글 거품/폭발 과학 실험 효과음
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(400, audioCtx.currentTime);
+                    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                    osc.start();
+                    for(let i=0; i<8; i++) {
+                        osc.frequency.setValueAtTime(200 + Math.random() * 800, audioCtx.currentTime + (i * 0.05));
+                    }
+                    gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.45);
+                    osc.stop(audioCtx.currentTime + 0.45);
+                }
+            } catch (e) {
+                console.log("Audio synthesized blocked by browser standard policy.");
+            }
         }
 
-        function playSuccessSound() {
-            playTone(523.25, 'sine', 0.15); // 도
-            setTimeout(() => playTone(659.25, 'sine', 0.15), 100); // 미
-            setTimeout(() => playTone(783.99, 'sine', 0.3), 200); // 솔
-        }
-
-        function playFailSound() {
-            playTone(180, 'sawtooth', 0.4); // 부저음
-        }
-
-        function playBreakSound() {
-            playTone(400, 'triangle', 0.05);
-            setTimeout(() => playTone(250, 'triangle', 0.1), 50);
-        }
-
-        // 드래그 앤 드롭 이벤트 핸들러
+        // 드래그 기능 시작
         function drag(ev) {
-            ev.dataTransfer.setData("text/plain", ev.target.id);
-            ev.dataTransfer.setData("shape", ev.target.getAttribute("data-shape"));
-            ev.dataTransfer.setData("name", ev.target.getAttribute("data-name"));
+            ev.dataTransfer.setData("text", ev.target.id);
+            ev.target.classList.add('draggable-active');
         }
 
         function allowDrop(ev) {
             ev.preventDefault();
-            document.getElementById("enzyme-dropzone").classList.add("drag-over");
         }
 
-        function handleDragLeave(ev) {
-            document.getElementById("enzyme-dropzone").classList.remove("drag-over");
-        }
-
+        // 드롭 시 기질 특이성 매칭 유무 검사
         function drop(ev) {
             ev.preventDefault();
-            const dropzone = document.getElementById("enzyme-dropzone");
-            dropzone.classList.remove("drag-over");
+            const dataId = ev.dataTransfer.getData("text");
+            const draggedEl = document.getElementById(dataId);
+            if (!draggedEl) return;
+            draggedEl.classList.remove('draggable-active');
+            
+            // 타겟 슬롯 찾기 (부모 계층 포함)
+            let slot = ev.target;
+            while (slot && !slot.classList.contains('enzyme-slot')) {
+                slot = slot.parentElement;
+            }
+            if (!slot) return;
 
-            const id = ev.dataTransfer.getData("text/plain");
-            const shape = ev.dataTransfer.getData("shape");
-            const name = ev.dataTransfer.getData("name");
-            const msgBoard = document.getElementById("msg-board");
+            const slotId = slot.id;
+            const requiredEnzyme = draggedEl.getAttribute('data-match');
+            attemptsCount++;
 
-            // 펩신 효소의 활성부위 규격은 오직 'triangle(세모)' 구조만 허용
-            if (shape === "triangle") {
-                playSuccessSound();
-                msgBoard.innerHTML = `🟢 [결합 성공] '${name}'이(가) 펩신의 세모 모양 활성 부위에 정확히 결합하여 '효소-기질 복합체'를 형성했습니다!`;
-                msgBoard.className = "mt-6 bg-slate-900 text-emerald-400 p-4 rounded-xl font-mono text-xs min-h-[70px] flex items-center shadow-inner border border-slate-800";
+            // 슬롯이 이미 가득 차있는 경우
+            if (matchedState[slotId] !== null) {
+                document.getElementById('lab-feedback').innerText = "해당 효소에는 이미 기질이 결합해 있습니다!";
+                document.getElementById('lab-feedback').className = "my-4 text-center text-sm font-semibold text-rose-500";
+                playSound('error');
+                return;
+            }
+
+            // 기질 특이성 검사
+            if (requiredEnzyme === slotId) {
+                // 짝이 올바르게 맞은 경우
+                matchedState[slotId] = dataId;
+                successCount++;
                 
-                // 결합 시각 효과 및 분해 프로세스 작동
-                const enzymeBody = document.getElementById("enzyme-body");
-                enzymeBody.className = "bg-emerald-600 text-white w-64 h-40 rounded-3xl flex flex-col items-center justify-start pt-4 shadow-lg relative border-4 border-emerald-700 transition duration-300";
+                // 해당 슬롯 UI 갱신
+                slot.classList.remove('bg-slate-50', 'border-slate-200');
+                slot.classList.add('bg-emerald-50', 'border-emerald-400', 'correct-glow');
+                slot.querySelector('.slot-status').innerText = `결합 성공 (효소-기질 복합체)`;
+                slot.querySelector('.slot-status').className = "slot-status text-xs text-emerald-600 font-bold mt-2";
                 
-                // 1.5초 후 화학 반응 완료 (생성물 아미노산/펩타이드 분해 효과)
-                setTimeout(() => {
-                    playBreakSound();
-                    msgBoard.innerHTML = `✨ [반응 완료] 펩타이드 결합이 가수분해되어 생성물(펩타이드/아미노산)로 분해되었습니다. 효소는 변형되지 않고 재사용 가능 상태가 됩니다!`;
-                    enzymeBody.className = "bg-indigo-600 text-white w-64 h-40 rounded-3xl flex flex-col items-center justify-start pt-4 shadow-lg relative border-4 border-indigo-700 transition duration-300";
-                }, 1800);
+                // 기존 기질 카드는 안보이게 처리(결합된 연출을 위해)
+                draggedEl.classList.add('hidden');
+                
+                // 수용체 구멍을 해당 물질 모양으로 채우기
+                const receptor = slot.querySelector('.slot-receptor');
+                if (receptor) {
+                    receptor.className = "my-4 w-16 h-16 bg-emerald-400 rounded-xl flex items-center justify-center text-white font-bold transition duration-300 animate-bounce slot-receptor";
+                    const emojiNode = draggedEl.querySelector('span');
+                    const emojiText = emojiNode ? emojiNode.innerText : "🍕";
+                    receptor.innerHTML = `<span class="text-2xl">${emojiText}</span>`;
+                }
 
+                document.getElementById('lab-feedback').innerText = `성공! ${draggedEl.querySelector('.font-bold').innerText}과 ${slot.querySelector('.font-bold').innerText}이 입체 구조에 맞게 결합했습니다.`;
+                document.getElementById('lab-feedback').className = "my-4 text-center text-sm font-semibold text-emerald-600";
+                playSound('success');
+                
+                // 성공 현황 데이터 업데이트
+                updateDashboard();
+                checkMasterButton();
             } else {
-                playFailSound();
-                msgBoard.innerHTML = `❌ [결합 실패] '${name}'은(는) 구조가 맞지 않습니다. 펩신의 활성 부위는 세모 구조인데, 이 기질은 다른 입체 구조를 가졌기 때문에 반응
+                // 입체 구조 불일치
+                document.getElementById('lab-feedback').innerText = `결합 실패! 입체 구조(모양)가 맞지 않아 결합하지 못합니다 (기질 특이성).`;
+                document.getElementById('lab-feedback').className = "my-4 text-center text-sm font-semibold text-rose-500";
+                playSound('error');
+                updateDashboard();
+            }
+        }
+
+        // 실시간 대시보드 갱신
+        function updateDashboard() {
+            if (attemptsCount === 0) {
+                document.getElementById('stat-accuracy').innerText = "0%";
+            } else {
+                const acc = Math.round((successCount / attemptsCount) * 100);
+                document.getElementById('stat-accuracy').innerText = `${acc}%`;
+            }
+            document.getElementById('stat-products').innerText = `${createdProductsCount}개`;
+        }
+
+        // 마스터 활성화 버튼 검사
+        function checkMasterButton() {
+            const hasMatches = Object.values(matchedState).some(val => val !== null);
+            const btn = document.getElementById('btn-run-reaction');
+            if (hasMatches) {
+                btn.removeAttribute('disabled');
+                btn.className = "bg-indigo-600 hover:bg-indigo-700 hover:scale-105 text-white font-bold py-3.5 px-10 rounded-2xl shadow-md cursor-pointer transition-all duration-300 text-base flex items-center gap-2";
+            } else {
+                btn.setAttribute('disabled', 'true');
+                btn.className = "bg-indigo-300 text-white cursor-not-allowed font-bold py-3.5 px-10 rounded-2xl shadow-md transition-all duration-300 text-base flex items-center gap-2";
+            }
+        }
+
+        // 화학 반응 진행 (활성화 에너지를 낮춰 생성물로 쪼개짐)
+        function runReaction() {
+            playSound('reaction');
+            document.getElementById('lab-feedback').innerText = "효소가 활성화 에너지를 낮추어 화학 반응(이화 작용)을 촉진합니다!";
+            document.getElementById('lab-feedback').className = "my-4 text-center text-sm font-semibold text-indigo-700";
+
+            Object.keys(matchedState).forEach(slotId => {
+                const subId = matchedState[slotId];
+                if (subId) {
+                    const slot = document.getElementById(slotId);
+                    if (!slot) return;
+                    const receptor = slot.querySelector('.slot-receptor');
+                    if (!receptor) return;
+
+                    // 생성물(쪼개진 조각)을 화면에 띄우는 이펙트
+                    const rect = receptor.getBoundingClientRect();
+
+                    // 왼쪽 생성물 생성
+                    const p1 = document.createElement('div');
+                    p1.className = "absolute text-2xl split-product-left z-40";
+                    p1.innerText = getProductPieces(subId)[0];
+                    p1.style.left = `${receptor.offsetLeft + 10}px`;
+                    p1.style.top = `${receptor.offsetTop + 10}px`;
+                    slot.appendChild(p1);
+
+                    // 오른쪽 생성물 생성
+                    const p2 = document.createElement('div');
+                    p2.className = "absolute text-2xl split-product-right z-40";
+                    p2.innerText = getProductPieces(subId)[1];
+                    p2.style.left = `${receptor.offsetLeft + 10}px`;
+                    p2.style.top = `${receptor.offsetTop + 10}px`;
+                    slot.appendChild(p2);
+
+                    createdProductsCount += 2;
+
+                    // 애니메이션 후 원상복구 (효소는 반응 전후로 변하지 않음)
+                    setTimeout(() => {
+                        p1.remove();
+                        p2.remove();
+                        
+                        // 효소 상태만 원래대로 재사용 대기
+                        slot.classList.remove('bg-emerald-50', 'border-emerald-400', 'correct-glow');
+                        slot.classList.add('bg-slate-50', 'border-slate-200');
+                        slot.querySelector('.slot-status').innerText = `비어 있음 (재사용 가능)`;
+                        slot.querySelector('.slot-status').className = "slot-status text-xs text-slate-400 font-medium";
+                        
+                        // 효소 수용체 모양 원래대로
+                        restoreReceptor(slotId, receptor);
+                        
+                        matchedState[slotId] = null;
+                        checkMasterButton();
+                        updateDashboard();
+                    }, 1200);
+                }
+            });
+        }
+
+        // 기질 별 생성물 조각 반환 함수
+        function getProductPieces(subId) {
+            switch (subId) {
+                case 'sub-starch': return ['🍭', '🍭']; // 녹말 -> 엿당
+                case 'sub-glycogen': return ['🍬', '🍬']; // 글리코젠 -> 포도당
+                case 'sub-protein': return ['🧬', '🧬']; // 단백질 -> 아미노산 조각
+                case 'sub-collagen': return ['🦴', '🦴']; // 콜라겐 -> 아미노산 조각
+                case 'sub-lipid': return ['🧪', '🧪']; // 지방 -> 지방산/글리세롤
+                case 'sub-sesame': return ['💧', '💧']; // 참기름 -> 지방산
+                default: return ['✨', '✨'];
+            }
+        }
+
+        // 수용체 복원 함수
+        function restoreReceptor(slotId, receptor) {
+            if (!receptor) return;
+            // 인라인 스타일 및 트랜지션 초기화
+            receptor.removeAttribute('style');
+            
+            if (slotId === 'enzyme-amylase') {
+                receptor.className = "my-4 w-16 h-16 rounded-full border-4 border-dashed border-sky-400/40 bg-white flex items-center justify-center slot-receptor";
+                receptor.innerHTML = '<span class="text-xs text-slate-300">둥근 홈</span>';
+            } else if (slotId === 'enzyme-pepsin') {
+                receptor.className = "my-4 w-16 h-16 border-4 border-dashed border-rose-400/40 bg-white flex items-center justify-center slot-receptor";
+                receptor.setAttribute('style', 'clip-path: polygon(50% 0%, 0% 100%, 100% 100%);');
+                receptor.innerHTML = '<span class="text-[10px] text-slate-300 mt-4">세모 홈</span>';
+            } else if (slotId === 'enzyme-lipase') {
+                receptor.className = "my-4 w-16 h-16 rounded-lg border-4 border-dashed border-amber-400/40 bg-white flex items-center justify-center slot-receptor";
+                receptor.innerHTML = '<span class="text-xs text-slate-300">네모 홈</span>';
+            }
+        }
+
+        // 실험 리셋
+        function resetLab() {
+            attemptsCount = 0;
+            successCount = 0;
+            createdProductsCount = 0;
+            
+            // 모든 묶음 해제 및 카드 재배치
+            document.querySelectorAll('.substrate-card').forEach(card => {
+                card.classList.remove('hidden');
+            });
+
+            Object.keys(matchedState).forEach(slotId => {
+                const slot = document.getElementById(slotId);
+                if (!slot) return;
+                const receptor = slot.querySelector('.slot-receptor');
+                
+                slot.classList.remove('bg-emerald-50', 'border-emerald-400', 'correct-glow');
+                slot.classList.add('bg-slate-50', 'border-slate-200');
+                slot.querySelector('.slot-status').innerText = `비어 있음`;
+                slot.querySelector('.slot-status').className = "slot-status text-xs text-slate-400 font-medium";
+                
+                restoreReceptor(slotId, receptor);
+                matchedState[slotId] = null;
+            });
+
+            document.getElementById('lab-feedback').innerText = "실험실이 초기화되었습니다. 반응물을 결합해 보세요!";
+            document.getElementById('lab-feedback').className = "my-4 text-center text-sm font-semibold text-indigo-700";
+            
+            checkMasterButton();
+            updateDashboard();
+        }
+    </script>
+</body>
+</html>
